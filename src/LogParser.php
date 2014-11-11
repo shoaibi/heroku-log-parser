@@ -2,7 +2,7 @@
 
 require_once('ArrayUtil.php');
 
-// file might have silly line endings line \r, need to account for that.
+// file might have silly line ending character \r (Mac), need to account for that.
 ini_set("auto_detect_line_endings", true);
 
 /**
@@ -43,17 +43,17 @@ class LogParser
         {
             throw new BadFunctionCallException("method and requestPath both should be provided");
         }
-        $summary    = $this->parseFileAndPopulateSummaryData($method, $requestPath);
+        $summary    = $this->parseFileAndGenerateSummaryData($method, $requestPath);
         $this->formatOutput($method, $requestPath, $summary);
 	}
 
     /**
-     * Parse log file and populate total occurrences, dynos and response times data into provided variables
+     * Parse log file and generate summary data
      * @param $method
      * @param $requestPath
      * @return array
      */
-    protected function parseFileAndPopulateSummaryData($method, $requestPath)
+    protected function parseFileAndGenerateSummaryData($method, $requestPath)
     {
         // using "@" is really bad practice but I know what I am doing. I am handling the failures manually
         // by using intelligent method(exceptions) over php's legacy trigger_error
@@ -62,6 +62,8 @@ class LogParser
         {
             // chance of this happened are very rare due to validateFileExistsAndIsReadable()
             // still here to handle the exceptionally exceptional scenario
+            // How rare?
+            // @see check LogParserTest.testParseWithFileBecomingUnreadableAfterConstruct()
             throw new RuntimeException("Unable to open {$this->filePath} for reading");
         }
         // doing line by line parsing instead to save memory. In the worst case I would only consume
@@ -86,7 +88,7 @@ class LogParser
     }
 
     /**
-     * Parse a single log line for summary data
+     * Parse a single log line for summary data and populate summary data into arguments
      * @param $method
      * @param $requestPath
      * @param $line
@@ -116,6 +118,10 @@ class LogParser
      */
     protected function formatOutput($method, $requestPath, array $summary)
     {
+        // these 3 aren't really needed.
+        // here for:
+        // 1- To not give warnings in IDE about unknown variables
+        // 2- To set a default value, always a safer practice.
         $dynos                  = array();
         $totalOccurrences       = 0;
         $responseTimes          = array();
@@ -158,7 +164,7 @@ SUMMARY;
     }
 
     /**
-     * Validate the log file path provided
+     * Validate the log file path provided against bunch of criteria
      * @param $filePath
      */
     protected function validateLogFile($filePath)
@@ -170,7 +176,7 @@ SUMMARY;
     }
 
     /**
-     * Validate provided file path
+     * Validate provided file path is a string
      * @param $filePath
      */
     protected function validateFilePath($filePath)
@@ -244,7 +250,7 @@ SUMMARY;
         $value      = $this->getValueFromLogEntryForKey($logEntry, $key);
         // strip the time suffix off it.
         $value = substr($value, 0, -1 * strlen(static::TIME_UNIT));
-        // this type cast here just to be explicit about what I are returning
+        // this type cast is here just to be explicit about what I am returning
         return ((int)$value);
     }
 

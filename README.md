@@ -10,12 +10,11 @@ This repository contains the solution for the first assignment from Pocket Play 
 
 ## How to run the script? ##
 
+```
+$ php /path/to/invoker.php METHOD URI
 
 ```
-php /path/to/invoker.php METHOD URI
-
-```
-Here 
+Here
 
 * **METHOD** is any string that appears as value to "method" inside the log file
 * **URI** is any string that appears as value to "path" inside the log file.
@@ -26,32 +25,22 @@ method=POST path=/version_api/files
 ```
 invoking script like:
 ```
-php src/invoker.php GET /version_api/files
+$ php src/invoker.php GET /version_api/files
 ```
 would give
 ```
 No occurrences of GET /version_api/files found
 ```
 
-If you run without any arguments you'd get a not so nice exception explaining the usage:
+If you run without any arguments you'd get an error explaining the usage:
 ```
-php src/invoker.php
-PHP Fatal error:  Uncaught exception 'InvalidArgumentException' with message 'Wrong number of arguments.
-Usage:
-/home/shoaibi/public_html/pocketplaylab/src/invoker.php [HTTP_METHOD: GET|POST|...] [URI: /api/users/{user_id}/count_pending_messages]' in /home/shoaibi/public_html/pocketplaylab/src/invoker.php:15
-Stack trace:
-#0 {main}
-  thrown in /home/shoaibi/public_html/pocketplaylab/src/invoker.php on line 15
-
-Fatal error: Uncaught exception 'InvalidArgumentException' with message ' in /home/shoaibi/public_html/pocketplaylab/src/invoker.php on line 15
-
-InvalidArgumentException: Wrong number of arguments.
-Usage:
-/home/shoaibi/public_html/pocketplaylab/src/invoker.php [HTTP_METHOD: GET|POST|...] [URI: /api/users/{user_id}/count_pending_messages] in /home/shoaibi/public_html/pocketplaylab/src/invoker.php on line 15
-
-Call Stack:
-    0.0001     230568   1. {main}() /home/shoaibi/public_html/pocketplaylab/src/invoker.php:0
-
+$ php src/invoker.php POST
+  An Error Occurred.
+  Type: InvalidArgumentException
+  Message:
+  Wrong number of arguments.
+  Usage:
+  invoker.php [HTTP_METHOD: GET|POST|...] [URI: /api/users/{user_id}/count_pending_messages]
 ```
 
 ## Additional Resources ##
