@@ -102,11 +102,11 @@ class LogParser
         // wrapped space around both lookups.
         // It was necessary for requestPath to ensure I don't consider partial matches for requestPath
         // say considering /api/users/{user_id}/get_friends_score a match for /api/users/{user_id}
-        if (strpos($line, " method={$method} ") && strpos($line, " path={$requestPath} "))
+        if (strpos($line, " method={$method} ") !== false && strpos($line, " path={$requestPath} ") !== false)
         {
             $totalOccurrences++;
-            $responseTimes[]    = static::getResponseTimeValueFromLogEntry($line);
-            $dynos[]            = static::getValueFromLogEntryForKey($line, static::DYNO_KEY);
+            $responseTimes[]    = $this->getResponseTimeValueFromLogEntry($line);
+            $dynos[]            = $this->getValueFromLogEntryForKey($line, static::DYNO_KEY);
         }
     }
 
@@ -234,8 +234,8 @@ SUMMARY;
      */
     protected function getResponseTimeValueFromLogEntry($logEntry)
     {
-        $connectTime    = static::getTimeValueFromLogEntryForKey($logEntry, static::CONNECT_TIME_KEY);
-        $serviceTime    = static::getTimeValueFromLogEntryForKey($logEntry, static::SERVICE_TIME_KEY);
+        $connectTime    = $this->getTimeValueFromLogEntryForKey($logEntry, static::CONNECT_TIME_KEY);
+        $serviceTime    = $this->getTimeValueFromLogEntryForKey($logEntry, static::SERVICE_TIME_KEY);
         return $connectTime + $serviceTime;
     }
 
