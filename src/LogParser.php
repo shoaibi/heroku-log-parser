@@ -72,12 +72,14 @@ class LogParser
         $dynos                  = array();
         $totalOccurrences       = 0;
         $responseTimes          = array();
+        // replace placeholder in requestPath with relevant regex
+        $requestPathExpression  = $this->qualifyRequestPathForUserIdPattern($requestPath);
         // can't use steam_get_line instead of fgets. Even though log file may be quite large and even though
         // stream_get_line is bit more consistent with performance I don't know the line endings for sure.
         // and even if I do, hardcoding them wouldn't be very wise.
         while (($line = fgets($handle)) !== false)
         {
-            $this->parseLogLine($method, $requestPath, $line, $totalOccurrences, $responseTimes, $dynos);
+            $this->parseLogLine($method, $requestPathExpression, $line, $totalOccurrences, $responseTimes, $dynos);
         }
         if (!feof($handle))
         {
@@ -90,24 +92,43 @@ class LogParser
     /**
      * Parse a single log line for summary data and populate summary data into arguments
      * @param $method
-     * @param $requestPath
+     * @param $requestPathExpression
      * @param $line
      * @param $totalOccurrences
      * @param array $responseTimes
      * @param array $dynos
      */
-    protected function parseLogLine($method, $requestPath, $line, & $totalOccurrences, array & $responseTimes, array & $dynos)
+    protected function parseLogLine($method, $requestPathExpression, $line, & $totalOccurrences, array & $responseTimes, array & $dynos)
     {
-        // assuming that the lines may have data in different order, I would check for both expressions
-        // wrapped space around both lookups.
-        // It was necessary for requestPath to ensure I don't consider partial matches for requestPath
-        // say considering /api/users/{user_id}/get_friends_score a match for /api/users/{user_id}
-        if (strpos($line, " method={$method} ") !== false && strpos($line, " path={$requestPath} ") !== false)
+        if ($this->doesLineMatchMethodAndRequestPath($line, $method, $requestPathExpression))
         {
             $totalOccurrences++;
             $responseTimes[]    = $this->getResponseTimeValueFromLogEntry($line);
             $dynos[]            = $this->getValueFromLogEntryForKey($line, static::DYNO_KEY);
         }
+    }
+
+    /**
+     * Devise if the line contains both, method and the requestPath provided.
+     * @param $line
+     * @param $method
+     * @param $requestPathExpression
+     * @return bool
+     */
+    protected function doesLineMatchMethodAndRequestPath($line, $method, $requestPathExpression)
+    {
+        // assuming that the lines may have data in different order, I would check for both expressions separately
+        return (strpos($line, " method={$method} ") !== false && preg_match("#\spath={$requestPathExpression}\s#", $line));
+    }
+
+    /**
+     * Qualify request Path for userId pattern by replacing placeholder with regex
+     * @param $requestPath
+     * @return mixed
+     */
+    protected function qualifyRequestPathForUserIdPattern(& $requestPath)
+    {
+        return str_replace('{user_id}', '((\d)+)', $requestPath);
     }
 
     /**

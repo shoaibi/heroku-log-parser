@@ -123,9 +123,9 @@ class LogParserTest extends PHPUnit_Framework_TestCase
         $tmpFilename    = $metaData['uri'];
         $parser     = new LogParser($tmpFilename);
         ob_start();
-        $parser->parse('GET', '/api/users/1');
+        $parser->parse('GET', '/api/users/{user_id}');
         $contents   = ob_get_clean();
-        $this->assertEquals('No occurrences of GET /api/users/1 found', $contents);
+        $this->assertContains('No occurrences of GET /api/users/{user_id} found', $contents);
         fclose($tmpHandle);
     }
 
@@ -140,7 +140,7 @@ class LogParserTest extends PHPUnit_Framework_TestCase
         $metaData       = stream_get_meta_data($tmpHandle);
         $tmpFilename    = $metaData['uri'];
         $parser     = new LogParser($tmpFilename);
-        $parser->parse('GET', '/api/users/1');
+        $parser->parse('GET', '/api/users/{user_id}');
         fclose($tmpHandle);
     }
 
@@ -150,7 +150,7 @@ class LogParserTest extends PHPUnit_Framework_TestCase
         $fileContent    = 'at=info method=GET path=/api/users/0 dyno=web.13 connect=10ms service=20ms ';
         // even if I have lines with invalid format as long as these don't match the requestUri and method
         // I wouldn't need to worry
-        $fileContent    .= PHP_EOL . 'at=info method=GET path=/api/users/-1 dyno=web.1';
+        $fileContent    .= PHP_EOL . 'at=info method=GET path=/api/users/1/get_friends_score dyno=web.1';
         for ($i = 1; $i <= 20; $i++)
         {
             $fileContent    .= PHP_EOL . 'at=info method=GET path=/api/users/1 dyno=web.' . ($i % 3);
@@ -161,12 +161,12 @@ class LogParserTest extends PHPUnit_Framework_TestCase
         $tmpFilename    = $metaData['uri'];
         $parser     = new LogParser($tmpFilename);
         ob_start();
-        $parser->parse('GET', '/api/users/1');
+        $parser->parse('GET', '/api/users/{user_id}');
         fclose($tmpHandle);
         $contents   = ob_get_clean();
-        $this->assertContains('Number of times request was made: 20', $contents);
+        $this->assertContains('Number of times request was made: 21', $contents);
         $this->assertContains('Most active Dyno(s): web.1, web.2', $contents);
-        $this->assertContains('Least active Dyno(s): web.0', $contents);
+        $this->assertContains('Least active Dyno(s): web.13', $contents);
         $this->assertContains('Min. Response Time: ', $contents);
         $this->assertContains('Max. Response Time: ', $contents);
         $this->assertContains('Mean Response Time: ', $contents);
