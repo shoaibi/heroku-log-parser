@@ -130,7 +130,7 @@ class LogParser
         if (!$totalOccurrences)
         {
             // not using die() as it causes issue with ob_*
-            echo "No occurrences of {$method} {$requestPath} found";
+            echo "No occurrences of {$method} {$requestPath} found" . PHP_EOL;
             return;
         }
 
