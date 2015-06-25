@@ -52,9 +52,5 @@ None. Code is heavily commented and unit test are provided to further elaborate 
 * LogParser: 98.90%
 * ArrayUtil: 100%
 
-## Who do I talk to? ##
-* shoaibi@dotgeek.me
-* imshoaibi | skype
-
 ## License ##
 Code is provided as is with no liability and terms whatsoever. It may turn your toaster to zombie, it may trigger doomsday device. Try at your own risk.
