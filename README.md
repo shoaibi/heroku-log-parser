@@ -1,6 +1,7 @@
 # README #
 
-This repository contains the solution for the first assignment from Pocket Play Lab detailed at: https://docs.google.com/forms/d/1bmzuBRkNowhon5KbvTU8r-rEZKoCtcvPEDmvyfLZ_38/viewform?c=0&w=1
+## What is this about? ##
+Check requirements.md
 
 ## Overview of Code Organization ##
 
